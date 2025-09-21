@@ -136,6 +136,8 @@ jobs:
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION=""/' ./arch/arm64/configs/${{ matrix.kernel.codename }}_defconfig
 
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul  8 09:17:32 UTC 2025"/' ./common/init/Makefile
+
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
