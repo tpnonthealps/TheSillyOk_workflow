@@ -189,10 +189,7 @@ jobs:
 
           echo "Copying Image.lz4 and concatenating DTB files..."
           cp ./out/arch/arm64/boot/Image.lz4 ${{ env.ak3_dir }}/Image.lz4
-          if [ "${{ matrix.kernel.codename }}" == "gs201" ]; then
-            cat ./out/google-devices/gs201/dts/*.dtb > ${{ env.ak3_dir }}/dtb
-            #cp ./out/google-devices/gs201/dts/dtbo.img ../AnyKernel3/dtbo.img
-          fi
+          cat ./out/google-devices/${{ matrix.kernel.codename }}/dts/*.dtb > ${{ env.ak3_dir }}/dtb
 
           if [[ -n "${{ matrix.build.kpm }}" ]]; then
             cd ${{ env.ak3_dir }}
