@@ -290,13 +290,11 @@ jobs:
           Managers:
           -> https://github.com/WildKernels/Wild_KSU
           -> https://github.com/KernelSU-Next/KernelSU-Next
-          -> https://github.com/SukiSU-Ultra/SukiSU-Ultra
           -> https://github.com/rsuntk/KernelSU
           
           Features:
           [+] KSUN [${{ env.KSUN_V }}](${{ env.KSUN_URL }}) + WKSU Manager
           [+] RKSU [${{ env.RKSU_V }}](${{ env.RKSU_URL }})
-          [+] SUKI [${{ env.SUKI_V }}](${{ env.SUKI_URL }}) + KPM
           [+] SUSFS v1.5.9
           EOF
 
