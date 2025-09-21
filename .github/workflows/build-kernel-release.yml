@@ -83,6 +83,7 @@ jobs:
           cd ./KernelSU*
 
           patch -p1 --forward < ../../ok_patches/KSUN/KSUN-SUSFS-1.5.9.patch
+          patch -p1 --forward < ../../ok_patches/KSUN/WildJames-Manager.patch
 
           cd ..
           patch -p1 < 50_add_susfs_in_gki-${{ matrix.kernel.android_version }}-${{ matrix.kernel.kernel_version }}.patch || true
