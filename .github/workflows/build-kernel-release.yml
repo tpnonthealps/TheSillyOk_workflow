@@ -304,13 +304,15 @@ jobs:
             cd repo
             echo "repo_dir=$PWD" >> $GITHUB_ENV
 
-            TAG=$(date +"%Y/%m/%d")-r
+            TAG=$(date +"%Y/%m/%d")
             LATEST_TAG=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name')
 
             if [[ "$LATEST_TAG" == "$TAG"* ]]; then
+              echo "$TAG* == $LATEST_TAG"
               TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
             else
-              TAG="$TAG1"
+              echo "First release of the day"
+              TAG="$TAG-r1"
             fi
 
             gh release delete "$TAG" -y || true
