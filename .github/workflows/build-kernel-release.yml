@@ -57,17 +57,22 @@ jobs:
       - name: Download and extract GCC 14.2.0 toolchain
         run: |
           echo "Downloading GCC 14.2.0 cross-compiler toolchain..."
-          wget https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/14.2.0/x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar.gz
+          wget https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/14.2.0/x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar.gz -O gcc.tar.gz
           echo "Extracting .gz file..."
-          gunzip x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar.gz
+          gunzip gcc.tar.gz
           echo "Extracting .tar file..."
-          tar -xf x86_64-gcc-14.2.0-nolibc-aarch64-linux.tar
+          tar -xf gcc.tar
           echo "GCC 14.2.0 toolchain extracted successfully"
 
       - name: Clone Dependencies and set ENV
         run: |
           ANYKERNEL_BRANCH="sultan-${{ matrix.kernel.codename }}"
           SUSFS_BRANCH="gki-${{ matrix.kernel.android_version }}-${{ matrix.kernel.kernel_version }}"
+
+          sudo apt-get install -y --no-install-recommends ccache
+          ccache --max-size=2G
+          ccache --set-config=compression=true
+          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
           git clone --depth=1 https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH" AK3
           echo "ak3_dir=$PWD/AK3" >> $GITHUB_ENV
@@ -172,15 +177,25 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
           echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
+      - name: Cache Kernel Build
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.kernel.codename }}-${{ matrix.build.type }}-SUSFS_${{ matrix.susfs }}-ccache-${{ github.sha }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ matrix.kernel.codename }}-${{ matrix.build.type }}-SUSFS_${{ matrix.susfs }}-ccache-
+            ${{ matrix.kernel.codename }}-${{ matrix.build.type }}-
+            ${{ matrix.kernel.codename }}-
+
       - name: Build the Kernel
         run: |
           cd "${{ env.kernel_dir }}"
 
-          export KBUILD_BUILD_USER="Ok"
+          export KBUILD_BUILD_USER="TheSillyOk"
           export KBUILD_BUILD_HOST="Github"
 
           make CROSS_COMPILE=$GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- CC=$GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc -j$(nproc --all) ${{ matrix.kernel.defconfig }}
-          make CROSS_COMPILE=$GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux- CC=$GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc -j$(nproc --all)
+          make CROSS_COMPILE="ccache $GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux-" CC="ccache $GITHUB_WORKSPACE/gcc-14.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc" -j$(nproc --all)
 
       - name: Setup AnyKernel3 zip and KPM
         run: |
