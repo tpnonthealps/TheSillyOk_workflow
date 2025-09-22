@@ -33,7 +33,7 @@ jobs:
             folder: "KernelSU-Next"
             branch: "v1.1.0"
             ksu_patches: "KSUN/WildJames-Manager.patch"
-            kernel_patches: ""
+            kernel_patches: "sultan/scope-min-hooks-v1.5.patch"
             extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
             susfs_patch: "KSUN/KSUN-SUSFS-1.5.9.patch"
             ak3_suffix: "_KSUNext"
@@ -42,7 +42,7 @@ jobs:
             repo: "rsuntk/KernelSU"
             folder: "KernelSU"
             branch: "main"
-            kernel_patches: ""
+            kernel_patches: "../james_patches/sultan/syscall_hooks.patch"
             extra_configs: "CONFIG_KSU_MANUAL_HOOK=y"
             susfs_patch: "RKSU/RKSU-SUSFS-1.5.9.patch"
             ak3_suffix: "_RKSU"
@@ -118,18 +118,17 @@ jobs:
 
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/${{ matrix.build.repo }}/${{ matrix.build.branch }}/kernel/setup.sh" | bash -s ${{ env.ksu_branch }}
-          patch -p1 -F 3 < ${{ env.james_dir }}/next/scope_min_manual_hooks_v1.5.patch
 
           if [[ -n "${{ matrix.build.kernel_patches }}" ]]; then
             for patch_name in ${{ matrix.build.kernel_patches }}; do
-              patch -p1 -N < "${{ env.ok_dir }}/${patch_name}"
+              patch -p1 -F 3 < "${{ env.ok_dir }}/${patch_name}"
             done
           fi
 
           if [[ -n "${{ matrix.build.ksu_patches }}" ]]; then
             cd "${{ matrix.build.folder }}"
             for patch_name in ${{ matrix.build.ksu_patches }}; do
-              patch -p1 -N < "${{ env.ok_dir }}/${patch_name}"
+              patch -p1 < "${{ env.ok_dir }}/${patch_name}"
             done
             cd "${{ env.kernel_dir }}"
           fi
