@@ -111,7 +111,7 @@ jobs:
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION=/' ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
           perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul  8 09:17:32 UTC 2025"/' ./init/Makefile
 
-      - name: Add KernelSU
+      - name: Add KernelSU (${{ matrix.build.type }})
         if: matrix.build.ksu
         run: |
           cd "${{ env.kernel_dir }}"
