@@ -106,6 +106,12 @@ jobs:
         run: |
           cd "${{ env.kernel_dir }}"
 
+          if [[ -n "${{ matrix.build.kernel_patches }}" ]]; then
+            for patch_name in ${{ matrix.build.kernel_patches }}; do
+              patch -p1 -F 3 < "${{ env.ok_dir }}/${patch_name}"
+            done
+          fi
+
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
@@ -123,6 +129,13 @@ jobs:
           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
           echo "CONFIG_TCP_CONG_HTCP=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
+          if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
+            for config in ${{ matrix.build.extra_configs }}; do
+              echo "--> Added ${config} <--"
+              echo -e "\n${config}" >> "${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}"
+            done
+          fi
+
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION=/' ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
           perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul  8 09:17:32 UTC 2025"/' ./init/Makefile
 
@@ -137,12 +150,6 @@ jobs:
             cd "${{ matrix.build.folder }}" && git checkout "${{ matrix.build.checkout }}" && cd -
           fi
 
-          if [[ -n "${{ matrix.build.kernel_patches }}" ]]; then
-            for patch_name in ${{ matrix.build.kernel_patches }}; do
-              patch -p1 -F 3 < "${{ env.ok_dir }}/${patch_name}"
-            done
-          fi
-
           if [[ -n "${{ matrix.build.ksu_patches }}" ]]; then
             cd "${{ matrix.build.folder }}"
             for patch_name in ${{ matrix.build.ksu_patches }}; do
@@ -154,13 +161,6 @@ jobs:
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-
-          if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
-            for config in ${{ matrix.build.extra_configs }}; do
-              echo "--> Added ${config} <--"
-              echo -e "\n${config}" >> "${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}"
-            done
-          fi
 
       - name: Apply SUSFS Patches
         if: matrix.susfs
@@ -182,8 +182,6 @@ jobs:
 
           patch -p1 < 50_add_susfs_in_gki-${{ matrix.kernel.android_version }}-${{ matrix.kernel.kernel_version }}.patch || true
           patch -p1 --fuzz=3 < ${{ env.james_dir }}/sultan/sys.c_fix.patch
-
-          echo "Adding configuration settings to ${{ matrix.kernel.defconfig }}..."
 
           # Add SUSFS configuration settings
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
