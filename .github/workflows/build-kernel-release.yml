@@ -123,6 +123,9 @@ jobs:
 
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/${{ matrix.build.repo }}/${{ matrix.build.branch }}/kernel/setup.sh" | bash -s ${{ env.ksu_branch }}
+          if [[ -n "${{ matrix.build.checkout }}" ]]; then
+            cd "${{ matrix.build.folder }}" && git checkout "${{ matrix.build.checkout }}" && cd -
+          fi
 
           if [[ -n "${{ matrix.build.kernel_patches }}" ]]; then
             for patch_name in ${{ matrix.build.kernel_patches }}; do
