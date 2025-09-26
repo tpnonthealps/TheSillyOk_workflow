@@ -132,6 +132,8 @@ jobs:
           if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
             for config in ${{ matrix.build.extra_configs }}; do
               echo "--> Added ${config} <--"
+              config_name=$(echo "${config}" | cut -d "=" -f 1)
+              sed -i -E 's/.*($config_name=.*)/# \1/gi' ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
               echo -e "\n${config}" >> "${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}"
             done
           fi
