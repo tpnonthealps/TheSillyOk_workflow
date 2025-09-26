@@ -27,6 +27,16 @@ jobs:
 #          - type: Normal
 #            ksu: false
 #            ak3_suffix: ""
+          - type: KSU
+            ksu: true
+            repo: "tiann/KernelSU"
+            folder: "KernelSU"
+            branch: "main"
+            checkout: "4d3560b12bec5f238fe11f908a246f0ac97e9c27"
+            kernel_patches: "sultan/manual_hooks.patch"
+            extra_configs: "CONFIG_KPROBES=n"
+            susfs_patch: "../susfs/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+            ak3_suffix: "_KSU"
           - type: KSUN
             ksu: true
             repo: "KernelSU-Next/KernelSU-Next"
@@ -276,13 +286,16 @@ jobs:
           echo "sh_dir=$PWD/sh" >> $GITHUB_ENV
           echo "artifacts_dir=$PWD/downloaded-artifacts" >> $GITHUB_ENV
 
+          KSU_URL=$(git ls-remote https://github.com/tiann/KernelSU HEAD | awk '{print "https://github.com/tiann/KernelSU/commit/"$1}')
           KSUN_URL=$(git ls-remote https://github.com/KernelSU-Next/KernelSU-Next.git v1.1.0 | awk '{print "https://github.com/KernelSU-Next/KernelSU-Next/commit/"$1}')
           RKSU_URL=$(git ls-remote https://github.com/rsuntk/KernelSU HEAD | awk '{print "https://github.com/rsuntk/KernelSU/commit/"$1}')
           SUKI_URL=$(git ls-remote https://github.com/SukiSU-Ultra/SukiSU-Ultra HEAD | awk '{print "https://github.com/SukiSU-Ultra/SukiSU-Ultra/commit/"$1}')
+          echo "KSU_URL=$KSU_URL" >> $GITHUB_ENV
           echo "KSUN_URL=$KSUN_URL" >> $GITHUB_ENV
           echo "RKSU_URL=$RKSU_URL" >> $GITHUB_ENV
           echo "SUKI_URL=$SUKI_URL" >> $GITHUB_ENV
 
+          echo "KSU_V=$(./sh/get_ksuver.sh "tiann" "KernelSU" "main")" >> $GITHUB_ENV
           # echo "KSUN_V=$(./sh/get_ksuver.sh "KernelSU-Next" "KernelSU-Next" "v1.1.0")" >> $GITHUB_ENV
           echo "KSUN_V=12862" >> $GITHUB_ENV
           echo "RKSU_V=$(./sh/get_ksuver.sh "rsuntk" "KernelSU" "main")" >> $GITHUB_ENV
@@ -308,6 +321,7 @@ jobs:
           -> https://github.com/rsuntk/KernelSU
           
           Features:
+          [+] KSU [${{ env.KSU_V }}](${{ env.KSU_URL }})
           [+] KSUN [${{ env.KSUN_V }}](${{ env.KSUN_URL }}) + WKSU Manager
           [+] RKSU [${{ env.RKSU_V }}](${{ env.RKSU_URL }})
           [+] SUSFS v1.5.10
