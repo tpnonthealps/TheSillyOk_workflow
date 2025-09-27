@@ -41,9 +41,9 @@ jobs:
             ksu: true
             repo: "KernelSU-Next/KernelSU-Next"
             folder: "KernelSU-Next"
-            branch: "v1.1.0"
+            branch: "next"
             ksu_patches: "KSUN/WildJames-Manager.patch"
-            kernel_patches: "sultan/scope-min-hooks-v1.5.patch"
+            kernel_patches: "../james_patches/sultan/syscall_hooks.patch"
             extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
             susfs_patch: "KSUN/KSUN-SUSFS-1.5.10.patch"
             ak3_suffix: "_KSUNext"
@@ -287,7 +287,7 @@ jobs:
           echo "artifacts_dir=$PWD/downloaded-artifacts" >> $GITHUB_ENV
 
           KSU_URL=$(git ls-remote https://github.com/tiann/KernelSU HEAD | awk '{print "https://github.com/tiann/KernelSU/commit/"$1}')
-          KSUN_URL=$(git ls-remote https://github.com/KernelSU-Next/KernelSU-Next.git v1.1.0 | awk '{print "https://github.com/KernelSU-Next/KernelSU-Next/commit/"$1}')
+          KSUN_URL=$(git ls-remote https://github.com/KernelSU-Next/KernelSU-Next.git next | awk '{print "https://github.com/KernelSU-Next/KernelSU-Next/commit/"$1}')
           RKSU_URL=$(git ls-remote https://github.com/rsuntk/KernelSU HEAD | awk '{print "https://github.com/rsuntk/KernelSU/commit/"$1}')
           SUKI_URL=$(git ls-remote https://github.com/SukiSU-Ultra/SukiSU-Ultra HEAD | awk '{print "https://github.com/SukiSU-Ultra/SukiSU-Ultra/commit/"$1}')
           echo "KSU_URL=$KSU_URL" >> $GITHUB_ENV
@@ -296,8 +296,7 @@ jobs:
           echo "SUKI_URL=$SUKI_URL" >> $GITHUB_ENV
 
           echo "KSU_V=$(./sh/get_ksuver.sh "tiann" "KernelSU" "main")" >> $GITHUB_ENV
-          # echo "KSUN_V=$(./sh/get_ksuver.sh "KernelSU-Next" "KernelSU-Next" "v1.1.0")" >> $GITHUB_ENV
-          echo "KSUN_V=12862" >> $GITHUB_ENV
+          echo "KSUN_V=$(./sh/get_ksuver.sh "KernelSU-Next" "KernelSU-Next" "next")" >> $GITHUB_ENV
           echo "RKSU_V=$(./sh/get_ksuver.sh "rsuntk" "KernelSU" "main")" >> $GITHUB_ENV
           echo "SUKI_V=$(./sh/extract_ksuver.sh "https://github.com/SukiSU-Ultra/SukiSU-Ultra" "kernel/Makefile" "." "main")" >> $GITHUB_ENV
 
