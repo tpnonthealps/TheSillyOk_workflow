@@ -115,21 +115,21 @@ jobs:
           fi
 
           # Add additional tmpfs config setting
-          echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TMPFS_XATTR=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
           # Add additional config setting
-          echo "CONFIG_IP_NF_TARGET_TTL=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_IP_NF_TARGET_TTL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_IP6_NF_TARGET_HL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
           # Add BBR Config
-          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }} 
-          echo "CONFIG_TCP_CONG_BBR=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_NET_SCH_FQ=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_BIC=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }} 
+          echo "CONFIG_TCP_CONG_BBR=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_NET_SCH_FQ=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TCP_CONG_BIC=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_TCP_CONG_HTCP=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
           if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
             for config in ${{ matrix.build.extra_configs }}; do
@@ -140,8 +140,9 @@ jobs:
             done
           fi
 
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="${{ matrix.kernel.local_version }}"/' ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "${{ matrix.kernel.build_date }}"/' ./init/Makefile
+          sed -i 's/${LOCALVERSION+set}/set/' ${{ env.kernel_dir }}/scripts/setlocalversion
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="${{ matrix.kernel.local_version }}"/' ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "${{ matrix.kernel.build_date }}"/' ${{ env.kernel_dir }}/init/Makefile
 
       - name: Add KernelSU (${{ matrix.build.type }})
         if: matrix.build.ksu
@@ -188,9 +189,9 @@ jobs:
           patch -p1 --fuzz=3 < ${{ env.james_dir }}/sultan/sys.c_fix.patch
 
           # Add SUSFS configuration settings
-          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_KSU_SUSFS=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
 
       - name: Cache Kernel Build
         uses: actions/cache@v4
