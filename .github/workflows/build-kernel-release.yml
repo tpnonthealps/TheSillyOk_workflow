@@ -45,7 +45,7 @@ jobs:
             ksu_patches: "KSUN/WildJames-Manager.patch"
             kernel_patches: "../james_patches/sultan/syscall_hooks.patch"
             extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
-            susfs_patch: "KSUN/KSUN-SUSFS-1.5.10.patch"
+            susfs_patch: "sultan/KSUN/KSUN-SUSFS-1.5.10.patch"
             ak3_suffix: "_KSUNext"
           - type: RKSU
             ksu: true
@@ -54,7 +54,7 @@ jobs:
             branch: "main"
             kernel_patches: "../james_patches/sultan/syscall_hooks.patch"
             extra_configs: "CONFIG_KSU_MANUAL_HOOK=y"
-            susfs_patch: "RKSU/RKSU-SUSFS-1.5.10.patch"
+            susfs_patch: "sultan/RKSU/RKSU-SUSFS-1.5.10.patch"
             ak3_suffix: "_RKSU"
 
         susfs: [false, true]
