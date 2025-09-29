@@ -23,6 +23,8 @@ jobs:
             android_version: "android14"
             kernel_version: "6.1"
             defconfig: gs201_defconfig
+            local_version: "-android14-11-g66e758f7d0c0-ab13748739"
+            build_date: "Tue Jul  8 09:17:32 UTC 2025"
         build:
 #          - type: Normal
 #            ksu: false
@@ -138,8 +140,8 @@ jobs:
             done
           fi
 
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION=/' ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul  8 09:17:32 UTC 2025"/' ./init/Makefile
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="${{ matrix.kernel.local_version }}"/' ./arch/arm64/configs/${{ matrix.kernel.defconfig }}
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "${{ matrix.kernel.build_date }}"/' ./init/Makefile
 
       - name: Add KernelSU (${{ matrix.build.type }})
         if: matrix.build.ksu
