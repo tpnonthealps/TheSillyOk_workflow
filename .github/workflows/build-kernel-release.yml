@@ -34,7 +34,6 @@ jobs:
             repo: "tiann/KernelSU"
             folder: "KernelSU"
             branch: "main"
-            checkout: "4d3560b12bec5f238fe11f908a246f0ac97e9c27"
             kernel_patches: "../james_patches/next/next_hooks.patch"
             extra_configs: "CONFIG_KPROBES=n"
             susfs_patch: "../susfs/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
