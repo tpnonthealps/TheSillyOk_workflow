@@ -114,31 +114,17 @@ jobs:
             done
           fi
 
-          # Add additional tmpfs config setting
-          echo "CONFIG_TMPFS_XATTR=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-
-          # Add additional config setting
-          echo "CONFIG_IP_NF_TARGET_TTL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_IP6_NF_TARGET_HL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-
-          # Add BBR Config
-          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }} 
-          echo "CONFIG_TCP_CONG_BBR=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_NET_SCH_FQ=y" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_BIC=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-
+          configs="CONFIG_TMPFS_XATTR=y CONFIG_TMPFS_POSIX_ACL=y CONFIG_IP_NF_TARGET_TTL=y CONFIG_IP6_NF_TARGET_HL=y CONFIG_IP6_NF_MATCH_HL=y CONFIG_TCP_CONG_ADVANCED=y CONFIG_TCP_CONG_BBR=y CONFIG_NET_SCH_FQ=y CONFIG_TCP_CONG_BIC=n CONFIG_TCP_CONG_WESTWOOD=n CONFIG_TCP_CONG_HTCP=n"
           if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
-            for config in ${{ matrix.build.extra_configs }}; do
-              echo "--> Added ${config} <--"
-              config_name=$(echo "${config}" | cut -d "=" -f 1)
-              sed -i -E 's/.*($config_name=.*)/# \1/gi' ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
-              echo -e "\n${config}" >> "${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}"
-            done
+            configs="$configs ${{ matrix.build.extra_configs }}"
           fi
+
+          for config in $configs; do
+            echo "--> Added ${config} <--"
+            config_name=$(echo "${config}" | cut -d "=" -f 1)
+            sed -i -E 's/.*($config_name=.*)/# \1/gi' ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
+            echo -e "\n${config}" >> "${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}"
+          done
 
           sed -i 's/${LOCALVERSION+set}/set/' ${{ env.kernel_dir }}/scripts/setlocalversion
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="${{ matrix.kernel.local_version }}"/' ${{ env.kernel_dir }}/arch/arm64/configs/${{ matrix.kernel.defconfig }}
