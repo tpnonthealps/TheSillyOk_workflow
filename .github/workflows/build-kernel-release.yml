@@ -62,7 +62,7 @@ jobs:
         susfs: [false, true]
         exclude:
           - build:
-              type: "Normal"
+              ksu: false
             susfs: true
 
     steps:
