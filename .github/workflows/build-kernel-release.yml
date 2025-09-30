@@ -100,8 +100,10 @@ jobs:
           ${{ matrix.susfs && matrix.build.susfs_branch || false }} && ksu_branch="${{ matrix.build.susfs_branch }}" || ksu_branch="${{ matrix.build.branch }}" || true
           echo "ksu_branch=$ksu_branch" >> $GITHUB_ENV
 
-          zip_name="${{ github.run_number }}-${{ matrix.kernel.codename }}_A16_Sultan${{ matrix.build.ak3_suffix }}"
-          ${{ matrix.susfs }} && zip_name=$zip_name.SUSFS || true
+          build_type="${{ matrix.build.ak3_suffix }}"
+          ${{ matrix.susfs }} && build_type="$build_type.SUSFS" || true
+          date=$(date +"%d.%m.%Y")
+          zip_name="$date-${{ matrix.kernel.codename }}${build_type}_A16_Sultan-${{ github.run_number }}"
           echo "zip_name=$zip_name" >> $GITHUB_ENV
 
       - name: Setup kernel stuff
